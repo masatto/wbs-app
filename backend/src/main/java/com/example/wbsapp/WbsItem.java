@@ -15,6 +15,7 @@ public class WbsItem{
     @Id 
     @GeneratedValue 
     private Long id;
+    private Long parentId;
     private String name;
     private LocalDate startDate;
     private LocalDate endDate;
