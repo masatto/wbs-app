@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import type { WbsItem } from "../types/wbsItem";
+import type { WbsItem, WbsItemNode } from "../types/wbsItem";
+import { buildWbsTree } from "../utils/buildWbsTree";
 
 async function fetchWbsItem(): Promise<WbsItem[]> {
   const response = await fetch("http://localhost:8080/api/wbs-items");
@@ -11,7 +12,7 @@ async function fetchWbsItem(): Promise<WbsItem[]> {
   return response.json();
 }
 
-export const WbsItemList = () => {
+export const WbsTree = () => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["wbsItems"],
     queryFn: fetchWbsItem,
@@ -31,9 +32,27 @@ export const WbsItemList = () => {
 
   return (
     <ul>
-      {data.map((wbsItem) => (
-        <li key={wbsItem.id}>{wbsItem.name}</li>
+      {buildWbsTree(data).map((rootNode) => (
+        <WbsTreeNode key={rootNode.id} node={rootNode} />
       ))}
     </ul>
+  );
+};
+
+type Props = {
+  node: WbsItemNode;
+};
+
+export const WbsTreeNode = ({ node }: Props) => {
+  return (
+    <li>
+      {node.name}
+
+      <ul>
+        {node.children.map((child) => (
+          <WbsTreeNode key={child.id} node={child} />
+        ))}
+      </ul>
+    </li>
   );
 };
