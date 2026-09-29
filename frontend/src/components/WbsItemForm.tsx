@@ -1,20 +1,7 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import type { WbsItem, WbsItemForCreate } from "../types/wbsItem";
-
-async function postWbsItem(item: WbsItemForCreate): Promise<WbsItem> {
-  const responce = await fetch("http://localhost:8080/api/wbs-items", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(item),
-  });
-
-  if (!responce.ok) {
-    throw new Error(`HTTP Error:${responce.status}`);
-  }
-
-  return responce.json();
-}
+import { fetchWbsItems, postWbsItem } from "../api/wbsItems";
+import type { WbsItemForCreate } from "../types/wbsItem";
 
 export const WbsItemForm = () => {
   const [name, setName] = useState("");
@@ -43,6 +30,11 @@ export const WbsItemForm = () => {
 
     mutation.mutate(item);
   };
+
+  const { data, isPending } = useQuery({
+    queryKey: ["wbsItems"],
+    queryFn: fetchWbsItems,
+  });
 
   return (
     <form onSubmit={handleSubmit}>
@@ -79,11 +71,18 @@ export const WbsItemForm = () => {
       <div>
         <label>
           親番号
-          <input
-            type="number"
+          <select
             value={parentId}
             onChange={(e) => setParentId(e.target.value)}
-          />
+          >
+            <option value="">なし（ルートタスク）</option>
+            {!isPending &&
+              data?.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.name}
+                </option>
+              ))}
+          </select>
         </label>
       </div>
 

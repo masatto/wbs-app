@@ -1,21 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
-import type { WbsItem, WbsItemNode } from "../types/wbsItem";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteWbsItem, fetchWbsItems } from "../api/wbsItems";
+import type { WbsItemNode } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
-
-async function fetchWbsItem(): Promise<WbsItem[]> {
-  const response = await fetch("http://localhost:8080/api/wbs-items");
-
-  if (!response.ok) {
-    throw new Error(`HTTP Error:${response.status}`);
-  }
-
-  return response.json();
-}
 
 export const WbsTree = () => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["wbsItems"],
-    queryFn: fetchWbsItem,
+    queryFn: fetchWbsItems,
   });
 
   if (isPending) {
@@ -44,15 +35,40 @@ type Props = {
 };
 
 export const WbsTreeNode = ({ node }: Props) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: deleteWbsItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wbsItems"] });
+    },
+  });
+
+  const handleDelete = () => {
+    if (window.confirm(`「${node.name}」を本当に削除しますか？`)) {
+      mutation.mutate(node.id);
+    }
+  };
+
   return (
     <li>
       {node.name}
+
+      <button
+        type="button"
+        onClick={handleDelete}
+        disabled={mutation.isPending}
+      >
+        {mutation.isPending ? "削除中…" : "削除"}
+      </button>
 
       <ul>
         {node.children.map((child) => (
           <WbsTreeNode key={child.id} node={child} />
         ))}
       </ul>
+
+      {mutation.isError && <p>削除に失敗しました：{mutation.error?.message}</p>}
     </li>
   );
 };
