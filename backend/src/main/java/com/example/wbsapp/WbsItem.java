@@ -3,6 +3,8 @@ package com.example.wbsapp;
 import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -30,5 +32,23 @@ public class WbsItem{
     private LocalDate endDate;
     private int progress;
     private int orderIndex;
+
+    // @Enumerated(STRING)を付けないと、JPAのデフォルトは「enumの並び順の
+    // 整数（ORDINAL）」でDBに保存される。それだと後でenumの並びを変えたり
+    // 途中に値を挿入したりすると、既存データの意味が黙って変わってしまう
+    // ので、必ずSTRINGを指定する。
+    @Enumerated(EnumType.STRING)
+    private WbsStatus status = WbsStatus.NOT_STARTED;
+
+    @Enumerated(EnumType.STRING)
+    private WbsPriority priority = WbsPriority.MEDIUM;
+
+    private String assignee;
+    private Double effortDays;
+    private LocalDate actualStartDate;
+    private LocalDate actualEndDate;
+    private String notes;
+    private String category;
+    private boolean milestone;
 
 }
