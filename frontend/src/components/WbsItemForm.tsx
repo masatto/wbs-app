@@ -3,6 +3,8 @@ import { useState } from "react";
 import { fetchWbsItems, postWbsItem } from "../api/wbsItems";
 import type { WbsItemForCreate } from "../types/wbsItem";
 
+// タスク新規登録フォーム。useMutationでPOSTし、成功したら
+// ["wbsItems"]クエリをinvalidateしてWbsTree側の一覧を再取得させる。
 export const WbsItemForm = () => {
   const [name, setName] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -31,6 +33,11 @@ export const WbsItemForm = () => {
     mutation.mutate(item);
   };
 
+  // 親番号の<select>用に、既存タスク一覧を取得する。
+  // WbsTreeと同じqueryKeyなのでキャッシュを共有し、二重リクエストにならない。
+  // これは「存在しないparentIdを直接入力できてしまう」バグの修正でもある
+  // （自由入力の数値欄だと、存在しないidを指すタスクがツリーに一生
+  // 表示されない“幽霊データ”になっていた）。
   const { data, isPending } = useQuery({
     queryKey: ["wbsItems"],
     queryFn: fetchWbsItems,

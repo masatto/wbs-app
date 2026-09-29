@@ -1,5 +1,8 @@
 import type { WbsItem, WbsItemNode } from "../types/wbsItem";
 
+// フラットなWbsItem[]（各要素がparentIdだけ持つ）を、
+// 親子がネストしたWbsItemNode[]（ルートタスクの配列）に組み立てる。
+// Mapを使った2段階の変換で、O(n)で親子関係を解決する。
 export function buildWbsTree(items: WbsItem[]): WbsItemNode[] {
   const nodeMap = new Map<number, WbsItemNode>();
   const roots: WbsItemNode[] = [];

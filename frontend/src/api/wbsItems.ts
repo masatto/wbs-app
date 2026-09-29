@@ -4,6 +4,8 @@ import type {
   WbsItemForUpdate,
 } from "../types/wbsItem";
 
+// バックエンドのWbsItem CRUD APIをまとめたファイル。
+// WbsTree（一覧・削除・更新）とWbsItemForm（登録）の両方から使う。
 const BASE_URL = "http://localhost:8080/api/wbs-items";
 
 export async function fetchWbsItems(): Promise<WbsItem[]> {
