@@ -12,15 +12,15 @@ export const WbsTree = () => {
   });
 
   if (isPending) {
-    return <p>読み込み中…</p>;
+    return <p className="wbs-loading">読み込み中…</p>;
   }
 
   if (isError) {
-    return <p>{error.message}</p>;
+    return <p className="wbs-error">{error.message}</p>;
   }
 
   if (data.length === 0) {
-    return <p>登録されていません</p>;
+    return <p className="wbs-empty">登録されていません</p>;
   }
 
   const earliestStartDate = data.reduce((earliest, item) => {
@@ -28,7 +28,7 @@ export const WbsTree = () => {
   }, data[0].startDate);
 
   return (
-    <ul>
+    <ul className="wbs-tree">
       {buildWbsTree(data).map((rootNode) => (
         <WbsTreeNode
           key={rootNode.id}
@@ -107,25 +107,22 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
   return (
     <li>
       {isEditing ? (
-        <>
+        <div className="wbs-edit-row">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-           
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
-           
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-           
           <input
             type="number"
             min="0"
@@ -133,54 +130,57 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
             value={progress}
             onChange={(e) => setProgress(Number(e.target.value))}
           />
-           
           <button
             type="button"
+            className="wbs-btn wbs-btn-primary wbs-btn-sm"
             onClick={handleSave}
             disabled={updateMutation.isPending}
           >
             {updateMutation.isPending ? "保存中…" : "保存"}
           </button>
-           
           <button
             type="button"
+            className="wbs-btn wbs-btn-sm"
             onClick={handleCancel}
             disabled={updateMutation.isPending}
           >
             キャンセル
           </button>
-        </>
+        </div>
       ) : (
-        <>
-          <div style={{ paddingLeft: depth * 16 }}>
-            <p>{node.name}</p>
+        <div className="wbs-node">
+          <div className="wbs-node-name" style={{ paddingLeft: depth * 16 }}>
+            {node.name}
           </div>
-          <div style={{ position: "relative", height: "20px" }}>
+          <div className="wbs-bar-track">
             <div
+              className="wbs-bar-fill"
               style={{
-                position: "absolute",
                 left: `${offsetDays * 20}px`,
                 width: `${durationDays * 20}px`,
-                height: "100%",
-                backgroundColor: "steelblue",
               }}
             />
           </div>
-
-          <button type="button" onClick={() => setIsEditing(true)}>
-            編集
-          </button>
-
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-          >
-            {deleteMutation.isPending ? "削除中…" : "削除"}
-          </button>
-        </>
+          <div className="wbs-node-actions">
+            <button
+              type="button"
+              className="wbs-btn wbs-btn-sm"
+              onClick={() => setIsEditing(true)}
+            >
+              編集
+            </button>
+            <button
+              type="button"
+              className="wbs-btn wbs-btn-danger wbs-btn-sm"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "削除中…" : "削除"}
+            </button>
+          </div>
+        </div>
       )}
-      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+      <ul className="wbs-children">
         {node.children.map((child) => (
           <WbsTreeNode
             key={child.id}
@@ -192,11 +192,15 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
       </ul>
 
       {deleteMutation.isError && (
-        <p>削除に失敗しました：{deleteMutation.error?.message}</p>
+        <p className="wbs-error">
+          削除に失敗しました：{deleteMutation.error?.message}
+        </p>
       )}
 
       {updateMutation.isError && (
-        <p>更新に失敗しました：{updateMutation.error?.message}</p>
+        <p className="wbs-error">
+          更新に失敗しました：{updateMutation.error?.message}
+        </p>
       )}
     </li>
   );

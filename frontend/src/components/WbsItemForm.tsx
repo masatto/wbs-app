@@ -37,56 +37,47 @@ export const WbsItemForm = () => {
   });
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          タスク名
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          開始日
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          終了日
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          親番号
-          <select
-            value={parentId}
-            onChange={(e) => setParentId(e.target.value)}
-          >
-            <option value="">なし（ルートタスク）</option>
-            {!isPending &&
-              data?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-          </select>
-        </label>
-      </div>
+    <form className="wbs-form" onSubmit={handleSubmit}>
+      <label className="wbs-field">
+        タスク名
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        開始日
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        終了日
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        親番号
+        <select value={parentId} onChange={(e) => setParentId(e.target.value)}>
+          <option value="">なし（ルートタスク）</option>
+          {!isPending &&
+            data?.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+        </select>
+      </label>
 
-      <button type="submit">登録</button>
+      <button type="submit" className="wbs-btn wbs-btn-primary">
+        登録
+      </button>
     </form>
   );
 };
