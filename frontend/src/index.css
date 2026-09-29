@@ -210,6 +210,12 @@ p {
   height: 100%;
   background: var(--accent);
   border-radius: 4px;
+  overflow: hidden;
+}
+
+.wbs-bar-progress {
+  height: 100%;
+  background: var(--accent-strong);
 }
 
 .wbs-node-actions {

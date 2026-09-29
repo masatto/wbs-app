@@ -159,7 +159,12 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
                 left: `${offsetDays * 20}px`,
                 width: `${durationDays * 20}px`,
               }}
-            />
+            >
+              <div
+                className="wbs-bar-progress"
+                style={{ width: `${node.progress}%` }}
+              />
+            </div>
           </div>
           <div className="wbs-node-actions">
             <button
