@@ -3,6 +3,7 @@ import { useState } from "react";
 import { deleteWbsItem, fetchWbsItems, putWbsItem } from "../api/wbsItems";
 import type { WbsItemForUpdate, WbsItemNode } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
+import { daysBetween } from "../utils/dateMath";
 
 export const WbsTree = () => {
   const { data, isPending, isError, error } = useQuery({
@@ -22,10 +23,19 @@ export const WbsTree = () => {
     return <p>登録されていません</p>;
   }
 
+  const earliestStartDate = data.reduce((earliest, item) => {
+    return item.startDate < earliest ? item.startDate : earliest;
+  }, data[0].startDate);
+
   return (
     <ul>
       {buildWbsTree(data).map((rootNode) => (
-        <WbsTreeNode key={rootNode.id} node={rootNode} />
+        <WbsTreeNode
+          key={rootNode.id}
+          node={rootNode}
+          timelineStart={earliestStartDate}
+          depth={0}
+        />
       ))}
     </ul>
   );
@@ -33,9 +43,11 @@ export const WbsTree = () => {
 
 type Props = {
   node: WbsItemNode;
+  timelineStart: string;
+  depth: number;
 };
 
-export const WbsTreeNode = ({ node }: Props) => {
+export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
   // 編集用state
@@ -89,6 +101,9 @@ export const WbsTreeNode = ({ node }: Props) => {
     setIsEditing(false);
   };
 
+  const offsetDays = daysBetween(timelineStart, node.startDate);
+  const durationDays = daysBetween(node.startDate, node.endDate);
+
   return (
     <li>
       {isEditing ? (
@@ -137,7 +152,20 @@ export const WbsTreeNode = ({ node }: Props) => {
         </>
       ) : (
         <>
-          {node.name}
+          <div style={{ paddingLeft: depth * 16 }}>
+            <p>{node.name}</p>
+          </div>
+          <div style={{ position: "relative", height: "20px" }}>
+            <div
+              style={{
+                position: "absolute",
+                left: `${offsetDays * 20}px`,
+                width: `${durationDays * 20}px`,
+                height: "100%",
+                backgroundColor: "steelblue",
+              }}
+            />
+          </div>
 
           <button type="button" onClick={() => setIsEditing(true)}>
             編集
@@ -152,9 +180,14 @@ export const WbsTreeNode = ({ node }: Props) => {
           </button>
         </>
       )}
-      <ul>
+      <ul style={{ listStyle: "none", paddingLeft: 0 }}>
         {node.children.map((child) => (
-          <WbsTreeNode key={child.id} node={child} />
+          <WbsTreeNode
+            key={child.id}
+            node={child}
+            timelineStart={timelineStart}
+            depth={depth + 1}
+          />
         ))}
       </ul>
 
