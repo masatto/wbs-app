@@ -27,6 +27,13 @@ export const WbsTree = () => {
     return item.startDate < earliest ? item.startDate : earliest;
   }, data[0].startDate);
 
+  const latestEndDate = data.reduce((latest, item) => {
+    return item.endDate > latest ? item.endDate : latest;
+  }, data[0].endDate);
+
+  const rawDays = daysBetween(earliestStartDate, latestEndDate);
+  const totalTimelineDays = rawDays === 0 ? 1 : rawDays;
+
   return (
     <ul className="wbs-tree">
       {buildWbsTree(data).map((rootNode) => (
@@ -34,6 +41,7 @@ export const WbsTree = () => {
           key={rootNode.id}
           node={rootNode}
           timelineStart={earliestStartDate}
+          totalTimelineDays={totalTimelineDays}
           depth={0}
         />
       ))}
@@ -44,10 +52,16 @@ export const WbsTree = () => {
 type Props = {
   node: WbsItemNode;
   timelineStart: string;
+  totalTimelineDays: number;
   depth: number;
 };
 
-export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
+export const WbsTreeNode = ({
+  node,
+  timelineStart,
+  totalTimelineDays,
+  depth,
+}: Props) => {
   const [isEditing, setIsEditing] = useState(false);
 
   // 編集用state
@@ -156,8 +170,8 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
             <div
               className="wbs-bar-fill"
               style={{
-                left: `${offsetDays * 20}px`,
-                width: `${durationDays * 20}px`,
+                left: `${(offsetDays / totalTimelineDays) * 100}%`,
+                width: `${(durationDays / totalTimelineDays) * 100}%`,
               }}
             >
               <div
@@ -191,6 +205,7 @@ export const WbsTreeNode = ({ node, timelineStart, depth }: Props) => {
             key={child.id}
             node={child}
             timelineStart={timelineStart}
+            totalTimelineDays={totalTimelineDays}
             depth={depth + 1}
           />
         ))}
