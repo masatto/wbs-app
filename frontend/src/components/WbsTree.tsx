@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { deleteWbsItem, fetchWbsItems, putWbsItem } from "../api/wbsItems";
-import type { WbsItemForUpdate, WbsItemNode } from "../types/wbsItem";
+import { deleteWbsItem, fetchWbsItems } from "../api/wbsItems";
+import type { WbsItemNode } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
 import { daysBetween } from "../utils/dateMath";
+import { WbsItemEditForm } from "./WbsItemEditForm";
 
 // タスク一覧の取得と、ツリー全体の描画。
 // ガントチャートの基準になる「タイムラインの全体日数」もここで一度だけ
@@ -71,19 +72,9 @@ type Props = {
 // timelineStart・totalTimelineDays・depthは全階層で共通の値だが、
 // propsとしてバケツリレー式に子へ渡し続けている（React Contextは
 // まだ使っていない）。
-export const WbsTreeNode = ({
-  node,
-  timelineStart,
-  totalTimelineDays,
-  depth,
-}: Props) => {
+export const WbsTreeNode = (props: Props) => {
+  const { node, timelineStart, totalTimelineDays, depth } = props;
   const [isEditing, setIsEditing] = useState(false);
-
-  // 編集用state
-  const [name, setName] = useState(node.name);
-  const [startDate, setStartDate] = useState(node.startDate);
-  const [endDate, setEndDate] = useState(node.endDate);
-  const [progress, setProgress] = useState(node.progress);
 
   const queryClient = useQueryClient();
 
@@ -94,43 +85,10 @@ export const WbsTreeNode = ({
     },
   });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, item }: { id: number; item: WbsItemForUpdate }) =>
-      putWbsItem(id, item),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["wbsItems"] });
-      setIsEditing(false);
-    },
-  });
-
   const handleDelete = () => {
     if (window.confirm(`「${node.name}」を本当に削除しますか？`)) {
       deleteMutation.mutate(node.id);
     }
-  };
-
-  const handleSave = () => {
-    // parentId・orderIndexは編集フォームでは触らせていないが、PUTは
-    // 全フィールド必須（部分更新ではない）なので、nodeの現在値をそのまま
-    // 乗せて送り返す。ここを省略すると親子関係が壊れる。
-    const updatedItem: WbsItemForUpdate = {
-      name,
-      startDate,
-      endDate,
-      progress,
-      parentId: node.parentId,
-      orderIndex: node.orderIndex,
-    };
-
-    updateMutation.mutate({ id: node.id, item: updatedItem });
-  };
-
-  const handleCancel = () => {
-    setName(node.name);
-    setStartDate(node.startDate);
-    setEndDate(node.endDate);
-    setProgress(node.progress);
-    setIsEditing(false);
   };
 
   // ガントバーの位置（左端からのオフセット日数）と長さ（日数）。
@@ -141,46 +99,12 @@ export const WbsTreeNode = ({
   return (
     <li>
       {isEditing ? (
-        <div className="wbs-edit-row">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-          <input
-            type="number"
-            min="0"
-            max="100"
-            value={progress}
-            onChange={(e) => setProgress(Number(e.target.value))}
-          />
-          <button
-            type="button"
-            className="wbs-btn wbs-btn-primary wbs-btn-sm"
-            onClick={handleSave}
-            disabled={updateMutation.isPending}
-          >
-            {updateMutation.isPending ? "保存中…" : "保存"}
-          </button>
-          <button
-            type="button"
-            className="wbs-btn wbs-btn-sm"
-            onClick={handleCancel}
-            disabled={updateMutation.isPending}
-          >
-            キャンセル
-          </button>
-        </div>
+        <WbsItemEditForm
+          node={node}
+          onClose={() => {
+            setIsEditing(false);
+          }}
+        />
       ) : (
         <div className="wbs-node">
           {/* 字下げは名前側だけに付ける。バー側に付けると、階層が深い
@@ -241,12 +165,6 @@ export const WbsTreeNode = ({
       {deleteMutation.isError && (
         <p className="wbs-error">
           削除に失敗しました：{deleteMutation.error?.message}
-        </p>
-      )}
-
-      {updateMutation.isError && (
-        <p className="wbs-error">
-          更新に失敗しました：{updateMutation.error?.message}
         </p>
       )}
     </li>
