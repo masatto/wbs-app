@@ -37,6 +37,10 @@ public class WbsItemController {
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
+        List<WbsItem> children=wbsItemRepository.findByParentId(id);
+        for (WbsItem child :children) {     
+            delete(child.getId());    
+        }
         wbsItemRepository.deleteById(id);
     }
 }
