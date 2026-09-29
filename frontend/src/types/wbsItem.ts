@@ -13,3 +13,5 @@ export type WbsItemNode = WbsItem & {
 };
 
 export type WbsItemForCreate = Omit<WbsItem, "id" | "progress" | "orderIndex">;
+
+export type WbsItemForUpdate = Omit<WbsItem, "id">;

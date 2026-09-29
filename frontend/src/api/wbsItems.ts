@@ -1,4 +1,8 @@
-import type { WbsItem, WbsItemForCreate } from "../types/wbsItem";
+import type {
+  WbsItem,
+  WbsItemForCreate,
+  WbsItemForUpdate,
+} from "../types/wbsItem";
 
 const BASE_URL = "http://localhost:8080/api/wbs-items";
 
@@ -29,6 +33,21 @@ export async function postWbsItem(item: WbsItemForCreate): Promise<WbsItem> {
 export async function deleteWbsItem(id: number): Promise<void> {
   const response = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP Error:${response.status}`);
+  }
+}
+
+export async function putWbsItem(
+  id: number,
+  item: WbsItemForUpdate,
+): Promise<void> {
+  const response = await fetch(`${BASE_URL}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(item),
   });
 
   if (!response.ok) {
