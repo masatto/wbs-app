@@ -123,6 +123,9 @@ export const WbsTreeNode = (props: Props) => {
           <div className="wbs-badge">
             {WBS_ITEM_PRIORITY_LABEL[node.priority]}
           </div>
+          <div className="wbs-node-dates">
+            {node.effortDays !== null && `${node.effortDays}人日`}
+          </div>
           <div className="wbs-bar-track">
             {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
                 「トラック全体の幅に対する割合」として解釈される。

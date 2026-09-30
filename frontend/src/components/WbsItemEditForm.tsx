@@ -25,6 +25,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [status, setStatus] = useState(node.status);
   const [priority, setPriority] = useState(node.priority);
   const [assignee, setAssignee] = useState(node.assignee ?? "");
+  const [effortDays, setEffortDays] = useState(node.effortDays);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -52,6 +53,7 @@ export const WbsItemEditForm = (props: Props) => {
       status: status,
       priority: priority,
       assignee: assignee,
+      effortDays: effortDays,
     };
 
     if (startDate > endDate) {
@@ -92,6 +94,13 @@ export const WbsItemEditForm = (props: Props) => {
         type="text"
         value={assignee}
         onChange={(e) => setAssignee(e.target.value)}
+      />
+      <input
+        type="number"
+        value={effortDays === null ? "" : String(effortDays)}
+        onChange={(e) =>
+          setEffortDays(e.target.value === "" ? null : Number(e.target.value))
+        }
       />
       <label>
         ステータス

@@ -16,6 +16,7 @@ function makeItem(overrides: Partial<WbsItem> & Pick<WbsItem, "id">): WbsItem {
     status: "NOT_STARTED",
     priority: "MEDIUM",
     assignee: null,
+    effortDays: null,
     ...overrides,
   };
 }

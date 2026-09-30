@@ -10,6 +10,7 @@ export type WbsItem = {
   status: WbsItemStatus;
   priority: WbsItemPriority;
   assignee: string | null;
+  effortDays: number | null;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。
