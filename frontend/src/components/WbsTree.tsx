@@ -113,6 +113,7 @@ export const WbsTreeNode = (props: Props) => {
           <div className="wbs-node-name" style={{ paddingLeft: depth * 16 }}>
             {node.name}
           </div>
+          <div className="wbs-node-dates">{`${node.startDate}~${node.endDate}`}</div>
           <div className="wbs-bar-track">
             {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
                 「トラック全体の幅に対する割合」として解釈される。

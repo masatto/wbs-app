@@ -194,6 +194,14 @@ p {
   text-overflow: ellipsis;
 }
 
+.wbs-node-dates {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .wbs-bar-track {
   position: relative;
   flex: 1 1 auto;
