@@ -10,6 +10,7 @@ export const WbsItemForm = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [parentId, setParentId] = useState("");
+  const [assignee, setAssignee] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -29,6 +30,7 @@ export const WbsItemForm = () => {
       startDate,
       endDate,
       parentId: parentId === "" ? null : Number(parentId),
+      assignee: assignee === "" ? null : assignee,
     };
 
     if (item.startDate > item.endDate) {
@@ -92,6 +94,14 @@ export const WbsItemForm = () => {
                 </option>
               ))}
           </select>
+        </label>
+        <label className="wbs-field">
+          担当者
+          <input
+            type="text"
+            value={assignee}
+            onChange={(e) => setAssignee(e.target.value)}
+          />
         </label>
 
         <button type="submit" className="wbs-btn wbs-btn-primary">

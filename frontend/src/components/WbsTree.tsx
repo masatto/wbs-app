@@ -117,6 +117,7 @@ export const WbsTreeNode = (props: Props) => {
           <div className="wbs-node-name" style={{ paddingLeft: depth * 16 }}>
             {node.name}
           </div>
+          <div className="wbs-node-assignee">{node.assignee}</div>
           <div className="wbs-node-dates">{`${node.startDate}~${node.endDate}`}</div>
           <div className="wbs-badge">{WBS_ITEM_STATUS_LABEL[node.status]}</div>
           <div className="wbs-badge">

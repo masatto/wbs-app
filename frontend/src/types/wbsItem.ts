@@ -9,6 +9,7 @@ export type WbsItem = {
   parentId: number | null; // ルートタスクはnull
   status: WbsItemStatus;
   priority: WbsItemPriority;
+  assignee: string | null;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。

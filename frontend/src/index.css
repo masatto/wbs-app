@@ -202,6 +202,15 @@ p {
   font-variant-numeric: tabular-nums;
 }
 
+.wbs-node-assignee {
+  flex: 0 0 80px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .wbs-badge {
   flex: 0 0 auto;
   padding: 2px 8px;

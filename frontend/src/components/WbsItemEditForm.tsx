@@ -24,6 +24,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [progress, setProgress] = useState(node.progress);
   const [status, setStatus] = useState(node.status);
   const [priority, setPriority] = useState(node.priority);
+  const [assignee, setAssignee] = useState(node.assignee ?? "");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -50,6 +51,7 @@ export const WbsItemEditForm = (props: Props) => {
       orderIndex: node.orderIndex,
       status: status,
       priority: priority,
+      assignee: assignee,
     };
 
     if (startDate > endDate) {
@@ -85,6 +87,11 @@ export const WbsItemEditForm = (props: Props) => {
         max="100"
         value={progress}
         onChange={(e) => setProgress(Number(e.target.value))}
+      />
+      <input
+        type="text"
+        value={assignee}
+        onChange={(e) => setAssignee(e.target.value)}
       />
       <label>
         ステータス
