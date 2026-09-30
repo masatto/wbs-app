@@ -1,7 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { putWbsItem } from "../api/wbsItems";
-import type { WbsItemForUpdate, WbsItemNode } from "../types/wbsItem";
+import {
+  WBS_ITEM_STATUS_LABEL,
+  type WbsItemForUpdate,
+  type WbsItemNode,
+  type WbsItemStatus,
+} from "../types/wbsItem";
 
 type Props = {
   node: WbsItemNode;
@@ -15,6 +20,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [startDate, setStartDate] = useState(node.startDate);
   const [endDate, setEndDate] = useState(node.endDate);
   const [progress, setProgress] = useState(node.progress);
+  const [status, setStatus] = useState(node.status);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -39,6 +45,7 @@ export const WbsItemEditForm = (props: Props) => {
       progress,
       parentId: node.parentId,
       orderIndex: node.orderIndex,
+      status: status,
     };
 
     if (startDate > endDate) {
@@ -75,6 +82,19 @@ export const WbsItemEditForm = (props: Props) => {
         value={progress}
         onChange={(e) => setProgress(Number(e.target.value))}
       />
+      <label>
+        ステータス
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as WbsItemStatus)}
+        >
+          {Object.entries(WBS_ITEM_STATUS_LABEL).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </label>
       <button
         type="button"
         className="wbs-btn wbs-btn-primary wbs-btn-sm"

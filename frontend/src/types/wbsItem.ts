@@ -7,6 +7,7 @@ export type WbsItem = {
   progress: number;
   orderIndex: number;
   parentId: number | null; // ルートタスクはnull
+  status: WbsItemStatus;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。
@@ -18,9 +19,21 @@ export type WbsItemNode = WbsItem & {
 // 新規登録時に送る形。id・progress・orderIndexはサーバー側で決まる値
 // （id自動採番、progressは0スタート、orderIndexも今は未使用）なので、
 // フロントからは送らない。
-export type WbsItemForCreate = Omit<WbsItem, "id" | "progress" | "orderIndex">;
+export type WbsItemForCreate = Omit<
+  WbsItem,
+  "id" | "progress" | "orderIndex" | "status"
+>;
 
 // 更新時に送る形。idはURLパスに乗るので本文には不要。
 // それ以外は全フィールド必須——PUTは部分更新ではなく丸ごと上書きなので、
 // 送り忘れたフィールドはサーバー側でリセットされてしまう（WbsItemController参照）。
 export type WbsItemForUpdate = Omit<WbsItem, "id">;
+
+export type WbsItemStatus = "NOT_STARTED" | "IN_PROGRESS" | "DONE" | "ON_HOLD";
+
+export const WBS_ITEM_STATUS_LABEL: Record<WbsItemStatus, string> = {
+  NOT_STARTED: "未着手",
+  IN_PROGRESS: "進行中",
+  DONE: "完了",
+  ON_HOLD: "保留",
+};
