@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { deleteWbsItem, fetchWbsItems } from "../api/wbsItems";
-import { WBS_ITEM_STATUS_LABEL, type WbsItemNode } from "../types/wbsItem";
+import {
+  WBS_ITEM_PRIORITY_LABEL,
+  WBS_ITEM_STATUS_LABEL,
+  type WbsItemNode,
+} from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
 import { daysBetween } from "../utils/dateMath";
 import { WbsItemEditForm } from "./WbsItemEditForm";
@@ -115,6 +119,9 @@ export const WbsTreeNode = (props: Props) => {
           </div>
           <div className="wbs-node-dates">{`${node.startDate}~${node.endDate}`}</div>
           <div className="wbs-badge">{WBS_ITEM_STATUS_LABEL[node.status]}</div>
+          <div className="wbs-badge">
+            {WBS_ITEM_PRIORITY_LABEL[node.priority]}
+          </div>
           <div className="wbs-bar-track">
             {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
                 「トラック全体の幅に対する割合」として解釈される。

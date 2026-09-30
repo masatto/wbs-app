@@ -8,6 +8,7 @@ export type WbsItem = {
   orderIndex: number;
   parentId: number | null; // ルートタスクはnull
   status: WbsItemStatus;
+  priority: WbsItemPriority;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。
@@ -21,7 +22,7 @@ export type WbsItemNode = WbsItem & {
 // フロントからは送らない。
 export type WbsItemForCreate = Omit<
   WbsItem,
-  "id" | "progress" | "orderIndex" | "status"
+  "id" | "progress" | "orderIndex" | "status" | "priority"
 >;
 
 // 更新時に送る形。idはURLパスに乗るので本文には不要。
@@ -36,4 +37,12 @@ export const WBS_ITEM_STATUS_LABEL: Record<WbsItemStatus, string> = {
   IN_PROGRESS: "進行中",
   DONE: "完了",
   ON_HOLD: "保留",
+};
+
+export type WbsItemPriority = "HIGH" | "MEDIUM" | "LOW";
+
+export const WBS_ITEM_PRIORITY_LABEL: Record<WbsItemPriority, string> = {
+  HIGH: "高",
+  MEDIUM: "中",
+  LOW: "低",
 };

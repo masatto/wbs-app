@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { putWbsItem } from "../api/wbsItems";
 import {
+  WBS_ITEM_PRIORITY_LABEL,
   WBS_ITEM_STATUS_LABEL,
   type WbsItemForUpdate,
   type WbsItemNode,
+  type WbsItemPriority,
   type WbsItemStatus,
 } from "../types/wbsItem";
 
@@ -21,6 +23,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [endDate, setEndDate] = useState(node.endDate);
   const [progress, setProgress] = useState(node.progress);
   const [status, setStatus] = useState(node.status);
+  const [priority, setPriority] = useState(node.priority);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -46,6 +49,7 @@ export const WbsItemEditForm = (props: Props) => {
       parentId: node.parentId,
       orderIndex: node.orderIndex,
       status: status,
+      priority: priority,
     };
 
     if (startDate > endDate) {
@@ -89,6 +93,19 @@ export const WbsItemEditForm = (props: Props) => {
           onChange={(e) => setStatus(e.target.value as WbsItemStatus)}
         >
           {Object.entries(WBS_ITEM_STATUS_LABEL).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        優先度
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value as WbsItemPriority)}
+        >
+          {Object.entries(WBS_ITEM_PRIORITY_LABEL).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>
