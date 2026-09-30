@@ -17,7 +17,11 @@
       `WbsItemEditForm`に切り出す。
       理由：これから項目が9個近く増えるので、今のうちに切り出す方が安い。
 
-## Phase 1：バックエンドのフィールド一括追加（機械的作業） — 完了（2026-09-29、コンパイル確認のみ・実機未確認）
+## Phase 1：バックエンドのフィールド一括追加（機械的作業） — 完了（2026-09-30、実機確認済み）
+
+実機確認内容：新フィールドのデフォルト値（`status=NOT_STARTED`/`priority=MEDIUM`/
+`milestone=false`）、全フィールド指定でのPUT更新（日本語含む）、
+`WbsItemDependency`のPOST/GET/DELETE、すべて確認済み。
 
 `WbsItem`に追加するフィールド：
 
