@@ -15,6 +15,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [startDate, setStartDate] = useState(node.startDate);
   const [endDate, setEndDate] = useState(node.endDate);
   const [progress, setProgress] = useState(node.progress);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -39,6 +40,13 @@ export const WbsItemEditForm = (props: Props) => {
       parentId: node.parentId,
       orderIndex: node.orderIndex,
     };
+
+    if (startDate > endDate) {
+      setErrorMessage("開始日は終了日以前の日付にしてください");
+      return;
+    }
+
+    setErrorMessage("");
 
     updateMutation.mutate({ id: node.id, item: updatedItem });
   };
@@ -89,6 +97,8 @@ export const WbsItemEditForm = (props: Props) => {
           更新に失敗しました：{updateMutation.error?.message}
         </p>
       )}
+
+      {errorMessage && <p className="wbs-error">{errorMessage}</p>}
     </div>
   );
 };
