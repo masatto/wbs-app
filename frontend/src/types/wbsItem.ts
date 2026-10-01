@@ -13,6 +13,7 @@ export type WbsItem = {
   effortDays: number | null;
   actualStartDate: string | null;
   actualEndDate: string | null;
+  notes: string | null;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。

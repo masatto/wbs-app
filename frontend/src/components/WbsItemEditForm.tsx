@@ -28,6 +28,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [effortDays, setEffortDays] = useState(node.effortDays);
   const [actualStartDate, setActualStartDate] = useState(node.actualStartDate);
   const [actualEndDate, setActualEndDate] = useState(node.actualEndDate);
+  const [notes, setNotes] = useState(node.notes ?? "");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -58,10 +59,11 @@ export const WbsItemEditForm = (props: Props) => {
       effortDays: effortDays,
       actualStartDate: actualStartDate,
       actualEndDate: actualEndDate,
+      notes: notes,
     };
 
     if (startDate > endDate) {
-      setErrorMessage("開始日は終了日以前の日付にしてください");
+      setErrorMessage("計画開始は計画終了以前の日付にしてください");
       return;
     }
 
@@ -75,26 +77,23 @@ export const WbsItemEditForm = (props: Props) => {
   return (
     <>
       <div className="wbs-cell wbs-cell-name wbs-cell-edit-name">
-        <input
-          type="text"
-          className="wbs-edit-input"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <div className="wbs-edit-date-pair">
+        <label className="wbs-edit-mini-field">
+          タスク名
           <input
-            type="date"
+            type="text"
             className="wbs-edit-input"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-          <input
-            type="date"
+        </label>
+        <label className="wbs-edit-mini-field">
+          備考
+          <textarea
             className="wbs-edit-input"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
           />
-        </div>
+        </label>
       </div>
 
       <div className="wbs-cell">
@@ -165,6 +164,24 @@ export const WbsItemEditForm = (props: Props) => {
       </div>
 
       <div className="wbs-cell wbs-cell-timeline wbs-cell-edit-timeline">
+        <label className="wbs-edit-mini-field">
+          計画開始
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </label>
+        <label className="wbs-edit-mini-field">
+          計画終了
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </label>
         <label className="wbs-edit-mini-field">
           工数
           <input

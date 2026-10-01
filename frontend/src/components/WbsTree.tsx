@@ -201,6 +201,11 @@ export const WbsTreeNode = (props: Props) => {
           >
             {depth > 0 && <span className="wbs-node-connector">└</span>}
             {node.name}
+            {node.notes && (
+              <span className="wbs-notes-icon" title={node.notes}>
+                📝
+              </span>
+            )}
           </div>
           <div className="wbs-cell">{node.assignee}</div>
           <div className="wbs-cell">

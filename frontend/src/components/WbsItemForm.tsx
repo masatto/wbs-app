@@ -14,6 +14,7 @@ export const WbsItemForm = () => {
   const [effortDays, setEffortDays] = useState("");
   const [actualStartDate, setActualStartDate] = useState("");
   const [actualEndDate, setActualEndDate] = useState("");
+  const [notes, setNotes] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -37,10 +38,11 @@ export const WbsItemForm = () => {
       effortDays: effortDays === "" ? null : Number(effortDays),
       actualStartDate: actualStartDate === "" ? null : actualStartDate,
       actualEndDate: actualEndDate === "" ? null : actualEndDate,
+      notes: notes === "" ? null : notes,
     };
 
     if (item.startDate > item.endDate) {
-      setErrorMessage("開始日は終了日以前の日付にしてください");
+      setErrorMessage("計画開始は計画終了以前の日付にしてください");
       return;
     }
 
@@ -70,7 +72,7 @@ export const WbsItemForm = () => {
         />
       </label>
       <label className="wbs-field">
-        開始日
+        計画開始
         <input
           type="date"
           value={startDate}
@@ -78,7 +80,7 @@ export const WbsItemForm = () => {
         />
       </label>
       <label className="wbs-field">
-        終了日
+        計画終了
         <input
           type="date"
           value={endDate}
@@ -115,10 +117,14 @@ export const WbsItemForm = () => {
           onChange={(e) => setAssignee(e.target.value)}
         />
       </label>
+      <label className="wbs-field">
+        備考
+        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+      </label>
 
       <div className="wbs-field-section-label">実績（任意）</div>
       <label className="wbs-field">
-        開始日（実績）
+        実績開始
         <input
           type="date"
           value={actualStartDate}
@@ -126,7 +132,7 @@ export const WbsItemForm = () => {
         />
       </label>
       <label className="wbs-field">
-        終了日（実績）
+        実績終了
         <input
           type="date"
           value={actualEndDate}
