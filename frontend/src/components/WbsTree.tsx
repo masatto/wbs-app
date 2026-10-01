@@ -195,7 +195,7 @@ export const WbsTreeNode = (props: Props) => {
           <div
             className="wbs-cell wbs-cell-name"
             style={{ paddingLeft: depth * 20 }}
-            title={`${node.startDate}~${node.endDate}${
+            title={`${node.name}\n${node.startDate}~${node.endDate}${
               node.effortDays !== null ? ` ／ ${node.effortDays}人日` : ""
             }`}
           >
