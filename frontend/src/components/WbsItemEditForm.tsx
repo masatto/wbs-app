@@ -29,6 +29,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [actualStartDate, setActualStartDate] = useState(node.actualStartDate);
   const [actualEndDate, setActualEndDate] = useState(node.actualEndDate);
   const [notes, setNotes] = useState(node.notes ?? "");
+  const [category, setCategory] = useState(node.category ?? "");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -60,6 +61,7 @@ export const WbsItemEditForm = (props: Props) => {
       actualStartDate: actualStartDate,
       actualEndDate: actualEndDate,
       notes: notes,
+      category: category,
     };
 
     if (startDate > endDate) {
@@ -92,6 +94,15 @@ export const WbsItemEditForm = (props: Props) => {
             className="wbs-edit-input"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
+          />
+        </label>
+        <label className="wbs-edit-mini-field">
+          カテゴリ
+          <input
+            type="text"
+            className="wbs-edit-input"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
           />
         </label>
       </div>

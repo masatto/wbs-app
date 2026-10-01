@@ -20,6 +20,7 @@ function makeItem(overrides: Partial<WbsItem> & Pick<WbsItem, "id">): WbsItem {
     actualStartDate: null,
     actualEndDate: null,
     notes: null,
+    category: null,
     ...overrides,
   };
 }

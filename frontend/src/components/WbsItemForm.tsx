@@ -15,6 +15,7 @@ export const WbsItemForm = () => {
   const [actualStartDate, setActualStartDate] = useState("");
   const [actualEndDate, setActualEndDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [category, setCategory] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -39,6 +40,7 @@ export const WbsItemForm = () => {
       actualStartDate: actualStartDate === "" ? null : actualStartDate,
       actualEndDate: actualEndDate === "" ? null : actualEndDate,
       notes: notes === "" ? null : notes,
+      category: category === "" ? null : category,
     };
 
     if (item.startDate > item.endDate) {
@@ -120,6 +122,15 @@ export const WbsItemForm = () => {
       <label className="wbs-field">
         備考
         <textarea value={notes} onChange={(e) => setNotes(e.target.value)} />
+      </label>
+
+      <label className="wbs-field">
+        カテゴリ
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+        />
       </label>
 
       <div className="wbs-field-section-label">実績（任意）</div>

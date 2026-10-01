@@ -206,6 +206,9 @@ export const WbsTreeNode = (props: Props) => {
                 📝
               </span>
             )}
+            {node.category && (
+              <span className="wbs-badge">{node.category}</span>
+            )}
           </div>
           <div className="wbs-cell">{node.assignee}</div>
           <div className="wbs-cell">
