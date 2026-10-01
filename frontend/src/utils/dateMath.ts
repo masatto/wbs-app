@@ -6,3 +6,11 @@ export const daysBetween = (from: string, to: string): number => {
   const diffMs = toDay.getTime() - fromDay.getTime();
   return diffMs / (1000 * 60 * 60 * 24);
 };
+
+// ISO日付文字列に日数を足して、またISO日付文字列で返す（daysBetweenの逆）。
+// タイムラインの目盛り（ルーラー）で「起点からN日後の日付」を求めるのに使う。
+export const addDays = (date: string, days: number): string => {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};

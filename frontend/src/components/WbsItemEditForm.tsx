@@ -26,6 +26,8 @@ export const WbsItemEditForm = (props: Props) => {
   const [priority, setPriority] = useState(node.priority);
   const [assignee, setAssignee] = useState(node.assignee ?? "");
   const [effortDays, setEffortDays] = useState(node.effortDays);
+  const [actualStartDate, setActualStartDate] = useState(node.actualStartDate);
+  const [actualEndDate, setActualEndDate] = useState(node.actualEndDate);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -54,6 +56,8 @@ export const WbsItemEditForm = (props: Props) => {
       priority: priority,
       assignee: assignee,
       effortDays: effortDays,
+      actualStartDate: actualStartDate,
+      actualEndDate: actualEndDate,
     };
 
     if (startDate > endDate) {
@@ -66,45 +70,45 @@ export const WbsItemEditForm = (props: Props) => {
     updateMutation.mutate({ id: node.id, item: updatedItem });
   };
 
+  // 表示モード（WbsTreeNode）と同じ7列に、編集用の入力欄をはめ込む。
+  // 行ごとフォームに差し替わっても、列の位置はズレない。
   return (
-    <div className="wbs-edit-row">
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="date"
-        value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
-      />
-      <input
-        type="date"
-        value={endDate}
-        onChange={(e) => setEndDate(e.target.value)}
-      />
-      <input
-        type="number"
-        min="0"
-        max="100"
-        value={progress}
-        onChange={(e) => setProgress(Number(e.target.value))}
-      />
-      <input
-        type="text"
-        value={assignee}
-        onChange={(e) => setAssignee(e.target.value)}
-      />
-      <input
-        type="number"
-        value={effortDays === null ? "" : String(effortDays)}
-        onChange={(e) =>
-          setEffortDays(e.target.value === "" ? null : Number(e.target.value))
-        }
-      />
-      <label>
-        ステータス
+    <>
+      <div className="wbs-cell wbs-cell-name wbs-cell-edit-name">
+        <input
+          type="text"
+          className="wbs-edit-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <div className="wbs-edit-date-pair">
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="wbs-cell">
+        <input
+          type="text"
+          className="wbs-edit-input"
+          value={assignee}
+          onChange={(e) => setAssignee(e.target.value)}
+        />
+      </div>
+
+      <div className="wbs-cell">
         <select
+          className="wbs-edit-input"
           value={status}
           onChange={(e) => setStatus(e.target.value as WbsItemStatus)}
         >
@@ -114,10 +118,11 @@ export const WbsItemEditForm = (props: Props) => {
             </option>
           ))}
         </select>
-      </label>
-      <label>
-        優先度
+      </div>
+
+      <div className="wbs-cell">
         <select
+          className="wbs-edit-input"
           value={priority}
           onChange={(e) => setPriority(e.target.value as WbsItemPriority)}
         >
@@ -127,31 +132,90 @@ export const WbsItemEditForm = (props: Props) => {
             </option>
           ))}
         </select>
-      </label>
-      <button
-        type="button"
-        className="wbs-btn wbs-btn-primary wbs-btn-sm"
-        onClick={handleSave}
-        disabled={updateMutation.isPending}
-      >
-        {updateMutation.isPending ? "保存中…" : "保存"}
-      </button>
-      <button
-        type="button"
-        className="wbs-btn wbs-btn-sm"
-        onClick={onClose}
-        disabled={updateMutation.isPending}
-      >
-        キャンセル
-      </button>
+      </div>
 
-      {updateMutation.isError && (
-        <p className="wbs-error">
-          更新に失敗しました：{updateMutation.error?.message}
-        </p>
+      <div className="wbs-cell">
+        <input
+          type="number"
+          min="0"
+          max="100"
+          className="wbs-edit-input"
+          value={progress}
+          onChange={(e) => setProgress(Number(e.target.value))}
+        />
+      </div>
+
+      <div className="wbs-cell wbs-cell-actions">
+        <button
+          type="button"
+          className="wbs-btn wbs-btn-primary wbs-btn-sm"
+          onClick={handleSave}
+          disabled={updateMutation.isPending}
+        >
+          {updateMutation.isPending ? "保存中…" : "保存"}
+        </button>
+        <button
+          type="button"
+          className="wbs-btn wbs-btn-sm"
+          onClick={onClose}
+          disabled={updateMutation.isPending}
+        >
+          キャンセル
+        </button>
+      </div>
+
+      <div className="wbs-cell wbs-cell-timeline wbs-cell-edit-timeline">
+        <label className="wbs-edit-mini-field">
+          工数
+          <input
+            type="number"
+            className="wbs-edit-input"
+            value={effortDays === null ? "" : String(effortDays)}
+            onChange={(e) =>
+              setEffortDays(
+                e.target.value === "" ? null : Number(e.target.value),
+              )
+            }
+          />
+        </label>
+        <label className="wbs-edit-mini-field">
+          実績開始
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={actualStartDate === null ? "" : String(actualStartDate)}
+            onChange={(e) =>
+              setActualStartDate(
+                e.target.value === "" ? null : String(e.target.value),
+              )
+            }
+          />
+        </label>
+        <label className="wbs-edit-mini-field">
+          実績終了
+          <input
+            type="date"
+            className="wbs-edit-input"
+            value={actualEndDate === null ? "" : String(actualEndDate)}
+            onChange={(e) =>
+              setActualEndDate(
+                e.target.value === "" ? null : String(e.target.value),
+              )
+            }
+          />
+        </label>
+      </div>
+
+      {(updateMutation.isError || errorMessage) && (
+        <div className="wbs-cell wbs-cell-edit">
+          {updateMutation.isError && (
+            <p className="wbs-error">
+              更新に失敗しました：{updateMutation.error?.message}
+            </p>
+          )}
+          {errorMessage && <p className="wbs-error">{errorMessage}</p>}
+        </div>
       )}
-
-      {errorMessage && <p className="wbs-error">{errorMessage}</p>}
-    </div>
+    </>
   );
 };

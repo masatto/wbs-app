@@ -7,12 +7,22 @@ import {
   type WbsItemNode,
 } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
-import { daysBetween } from "../utils/dateMath";
+import { addDays, daysBetween } from "../utils/dateMath";
 import { WbsItemEditForm } from "./WbsItemEditForm";
+
+// タイムラインの目盛りに何個ラベルを出すか。
+const TICK_COUNT = 4;
 
 // タスク一覧の取得と、ツリー全体の描画。
 // ガントチャートの基準になる「タイムラインの全体日数」もここで一度だけ
 // 計算し、WbsTreeNodeに再帰で渡していく。
+//
+// 表示はCSS Gridで組んだ「表」。.wbs-tableに1つのgrid-template-columnsを
+// 定義し、ヘッダー行・各タスク行の全セルがそこに直接所属する（<ul>/<li>は
+// display:contentsにして、レイアウト上は透明な存在にする）。これにより、
+// 再帰で描画した親子構造をそのまま保ちながら、見た目は1タスク＝1行の
+// テーブルになる。タイムラインの目盛りも最後の列（スケジュール列）に
+// 置くことで、バーの位置と目盛りの位置が確実に一致する。
 export const WbsTree = () => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["wbsItems"],
@@ -47,18 +57,74 @@ export const WbsTree = () => {
   const rawDays = daysBetween(earliestStartDate, latestEndDate);
   const totalTimelineDays = rawDays === 0 ? 1 : rawDays;
 
+  // タイムライン全体を等間隔に区切って、目盛りに出す日付を求める。
+  // 例：TICK_COUNT=6なら、0%・20%・40%・60%・80%・100%の位置の日付。
+  const tickDates = Array.from({ length: TICK_COUNT }, (_, i) => {
+    const dayOffset = Math.round((totalTimelineDays * i) / (TICK_COUNT - 1));
+    return addDays(earliestStartDate, dayOffset);
+  });
+
   return (
-    <ul className="wbs-tree">
-      {buildWbsTree(data).map((rootNode) => (
-        <WbsTreeNode
-          key={rootNode.id}
-          node={rootNode}
-          timelineStart={earliestStartDate}
-          totalTimelineDays={totalTimelineDays}
-          depth={0}
-        />
-      ))}
-    </ul>
+    <>
+      {/* ガントバーの色分けを一度だけ説明する凡例。行ごとに繰り返さない。 */}
+      <div className="wbs-legend">
+        <span className="wbs-legend-item">
+          <span className="wbs-legend-swatch wbs-legend-swatch-plan" />
+          計画期間
+        </span>
+        <span className="wbs-legend-item">
+          <span className="wbs-legend-swatch wbs-legend-swatch-actual" />
+          実績期間
+        </span>
+      </div>
+
+      <div className="wbs-table">
+        {/* ヘッダー行（7セル）。最後のセルにタイムラインの目盛りを置く。 */}
+        <div className="wbs-cell wbs-cell-head">タスク名</div>
+        <div className="wbs-cell wbs-cell-head">担当者</div>
+        <div className="wbs-cell wbs-cell-head">ステータス</div>
+        <div className="wbs-cell wbs-cell-head">優先度</div>
+        <div className="wbs-cell wbs-cell-head">進捗</div>
+        <div className="wbs-cell wbs-cell-head">操作</div>
+        <div className="wbs-cell wbs-cell-head wbs-cell-timeline">
+          {/* 日付の目盛り。各バーと同じ%基準で位置決めしているので、
+              目盛りの位置とバーの位置が対応する。 */}
+          <div className="wbs-timeline-ruler">
+            {tickDates.map((date, i) => (
+              <span
+                key={i}
+                className="wbs-timeline-tick"
+                style={{
+                  left: `${(i / (TICK_COUNT - 1)) * 100}%`,
+                  transform:
+                    i === 0
+                      ? "none"
+                      : i === TICK_COUNT - 1
+                        ? "translateX(-100%)"
+                        : "translateX(-50%)",
+                }}
+              >
+                {/* 年を省略してMM-DDだけ表示（重なり対策で文字数を減らす）。
+                    ISO形式（"2026-09-01"）の6文字目以降がMM-DDにあたる。 */}
+                {date.slice(5)}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <ul className="wbs-tree">
+          {buildWbsTree(data).map((rootNode) => (
+            <WbsTreeNode
+              key={rootNode.id}
+              node={rootNode}
+              timelineStart={earliestStartDate}
+              totalTimelineDays={totalTimelineDays}
+              depth={0}
+            />
+          ))}
+        </ul>
+      </div>
+    </>
   );
 };
 
@@ -76,6 +142,9 @@ type Props = {
 // timelineStart・totalTimelineDays・depthは全階層で共通の値だが、
 // propsとしてバケツリレー式に子へ渡し続けている（React Contextは
 // まだ使っていない）。
+//
+// <li>はdisplay:contentsなので、実際に描画する7つの.wbs-cellが
+// 親の.wbs-tableグリッドに直接所属し、1行として扱われる。
 export const WbsTreeNode = (props: Props) => {
   const { node, timelineStart, totalTimelineDays, depth } = props;
   const [isEditing, setIsEditing] = useState(false);
@@ -100,9 +169,21 @@ export const WbsTreeNode = (props: Props) => {
   const offsetDays = daysBetween(timelineStart, node.startDate);
   const durationDays = daysBetween(node.startDate, node.endDate);
 
+  const actualOffsetDays =
+    node.actualStartDate !== null
+      ? daysBetween(timelineStart, node.actualStartDate)
+      : null;
+
+  const actualDurationDays =
+    node.actualStartDate !== null && node.actualEndDate !== null
+      ? daysBetween(node.actualStartDate, node.actualEndDate)
+      : null;
+
   return (
     <li>
       {isEditing ? (
+        // WbsItemEditForm自身が表示モードと同じ7列のセルを直接描画する
+        // ので、ここでは何も包まない（同じ<li>の直接の子として並べる）。
         <WbsItemEditForm
           node={node}
           onClose={() => {
@@ -110,41 +191,30 @@ export const WbsTreeNode = (props: Props) => {
           }}
         />
       ) : (
-        <div className="wbs-node">
-          {/* 字下げは名前側だけに付ける。バー側に付けると、階層が深い
-              タスクほど日付と無関係に右へズレてしまい、ガントチャート
-              として比較にならなくなる（実際に一度そのバグを踏んだ）。 */}
-          <div className="wbs-node-name" style={{ paddingLeft: depth * 16 }}>
+        <>
+          <div
+            className="wbs-cell wbs-cell-name"
+            style={{ paddingLeft: depth * 20 }}
+            title={`${node.startDate}~${node.endDate}${
+              node.effortDays !== null ? ` ／ ${node.effortDays}人日` : ""
+            }`}
+          >
+            {depth > 0 && <span className="wbs-node-connector">└</span>}
             {node.name}
           </div>
-          <div className="wbs-node-assignee">{node.assignee}</div>
-          <div className="wbs-node-dates">{`${node.startDate}~${node.endDate}`}</div>
-          <div className="wbs-badge">{WBS_ITEM_STATUS_LABEL[node.status]}</div>
-          <div className="wbs-badge">
-            {WBS_ITEM_PRIORITY_LABEL[node.priority]}
+          <div className="wbs-cell">{node.assignee}</div>
+          <div className="wbs-cell">
+            <span className="wbs-badge">
+              {WBS_ITEM_STATUS_LABEL[node.status]}
+            </span>
           </div>
-          <div className="wbs-node-dates">
-            {node.effortDays !== null && `${node.effortDays}人日`}
+          <div className="wbs-cell">
+            <span className="wbs-badge">
+              {WBS_ITEM_PRIORITY_LABEL[node.priority]}
+            </span>
           </div>
-          <div className="wbs-bar-track">
-            {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
-                「トラック全体の幅に対する割合」として解釈される。
-                これで画面幅やタイムラインの長さが変わっても自動で収まる。 */}
-            <div
-              className="wbs-bar-fill"
-              style={{
-                left: `${(offsetDays / totalTimelineDays) * 100}%`,
-                width: `${(durationDays / totalTimelineDays) * 100}%`,
-              }}
-            >
-              {/* 進捗（0〜100）をバーの中にさらに重ねて表示する */}
-              <div
-                className="wbs-bar-progress"
-                style={{ width: `${node.progress}%` }}
-              />
-            </div>
-          </div>
-          <div className="wbs-node-actions">
+          <div className="wbs-cell">{`${node.progress}%`}</div>
+          <div className="wbs-cell wbs-cell-actions">
             <button
               type="button"
               className="wbs-btn wbs-btn-sm"
@@ -161,8 +231,42 @@ export const WbsTreeNode = (props: Props) => {
               {deleteMutation.isPending ? "削除中…" : "削除"}
             </button>
           </div>
+          <div className="wbs-cell wbs-cell-timeline">
+            <div className="wbs-bar-track">
+              {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
+                  「トラック全体の幅に対する割合」として解釈される。
+                  これで画面幅やタイムラインの長さが変わっても自動で収まる。 */}
+              <div
+                className="wbs-bar-fill"
+                title={`計画期間：${node.startDate}~${node.endDate}`}
+                style={{
+                  left: `${(offsetDays / totalTimelineDays) * 100}%`,
+                  width: `${(durationDays / totalTimelineDays) * 100}%`,
+                }}
+              />
+              {actualOffsetDays !== null && actualDurationDays !== null && (
+                <div
+                  className="wbs-bar-actual"
+                  title={`実績期間：${node.actualStartDate}~${node.actualEndDate}`}
+                  style={{
+                    left: `${(actualOffsetDays / totalTimelineDays) * 100}%`,
+                    width: `${(actualDurationDays / totalTimelineDays) * 100}%`,
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {deleteMutation.isError && (
+        <div className="wbs-cell wbs-cell-edit">
+          <p className="wbs-error">
+            削除に失敗しました：{deleteMutation.error?.message}
+          </p>
         </div>
       )}
+
       <ul className="wbs-children">
         {node.children.map((child) => (
           <WbsTreeNode
@@ -174,12 +278,6 @@ export const WbsTreeNode = (props: Props) => {
           />
         ))}
       </ul>
-
-      {deleteMutation.isError && (
-        <p className="wbs-error">
-          削除に失敗しました：{deleteMutation.error?.message}
-        </p>
-      )}
     </li>
   );
 };

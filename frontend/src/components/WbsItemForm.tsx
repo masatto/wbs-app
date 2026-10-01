@@ -12,6 +12,8 @@ export const WbsItemForm = () => {
   const [parentId, setParentId] = useState("");
   const [assignee, setAssignee] = useState("");
   const [effortDays, setEffortDays] = useState("");
+  const [actualStartDate, setActualStartDate] = useState("");
+  const [actualEndDate, setActualEndDate] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -33,6 +35,8 @@ export const WbsItemForm = () => {
       parentId: parentId === "" ? null : Number(parentId),
       assignee: assignee === "" ? null : assignee,
       effortDays: effortDays === "" ? null : Number(effortDays),
+      actualStartDate: actualStartDate === "" ? null : actualStartDate,
+      actualEndDate: actualEndDate === "" ? null : actualEndDate,
     };
 
     if (item.startDate > item.endDate) {
@@ -56,70 +60,86 @@ export const WbsItemForm = () => {
   });
 
   return (
-    <>
-      <form className="wbs-form" onSubmit={handleSubmit}>
-        <label className="wbs-field">
-          タスク名
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <label className="wbs-field">
-          開始日
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-        </label>
-        <label className="wbs-field">
-          終了日
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </label>
-        <label className="wbs-field">
-          親番号
-          <select
-            value={parentId}
-            onChange={(e) => setParentId(e.target.value)}
-          >
-            <option value="">なし（ルートタスク）</option>
-            {!isPending &&
-              data?.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
-              ))}
-          </select>
-        </label>
-        <label className="wbs-field">
-          担当者
-          <input
-            type="text"
-            value={assignee}
-            onChange={(e) => setAssignee(e.target.value)}
-          />
-        </label>
-        <label className="wbs-field">
-          工数
-          <input
-            type="number"
-            value={effortDays}
-            step="0.5"
-            onChange={(e) => setEffortDays(e.target.value)}
-          />
-        </label>
+    <form className="wbs-form" onSubmit={handleSubmit}>
+      <label className="wbs-field wbs-field-name">
+        タスク名
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        開始日
+        <input
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        終了日
+        <input
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        工数
+        <input
+          type="number"
+          value={effortDays}
+          step="0.5"
+          onChange={(e) => setEffortDays(e.target.value)}
+        />
+      </label>
 
+      <label className="wbs-field">
+        親番号
+        <select value={parentId} onChange={(e) => setParentId(e.target.value)}>
+          <option value="">なし（ルートタスク）</option>
+          {!isPending &&
+            data?.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+        </select>
+      </label>
+      <label className="wbs-field">
+        担当者
+        <input
+          type="text"
+          value={assignee}
+          onChange={(e) => setAssignee(e.target.value)}
+        />
+      </label>
+
+      <div className="wbs-field-section-label">実績（任意）</div>
+      <label className="wbs-field">
+        開始日（実績）
+        <input
+          type="date"
+          value={actualStartDate}
+          onChange={(e) => setActualStartDate(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        終了日（実績）
+        <input
+          type="date"
+          value={actualEndDate}
+          onChange={(e) => setActualEndDate(e.target.value)}
+        />
+      </label>
+
+      <div className="wbs-form-footer">
         <button type="submit" className="wbs-btn wbs-btn-primary">
           登録
         </button>
-      </form>
-      <div>{errorMessage && <p className="wbs-error">{errorMessage}</p>}</div>
-    </>
+        {errorMessage && <p className="wbs-error">{errorMessage}</p>}
+      </div>
+    </form>
   );
 };

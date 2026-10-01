@@ -58,7 +58,7 @@ body {
 }
 
 #root {
-  max-width: 760px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 24px 16px 64px;
 }
@@ -77,10 +77,10 @@ p {
 /* --- form --- */
 
 .wbs-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px 16px;
+  padding: 20px;
   margin-bottom: 32px;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -91,8 +91,12 @@ p {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-secondary);
+}
+
+.wbs-field-name {
+  grid-column: span 3;
 }
 
 .wbs-field input,
@@ -113,6 +117,24 @@ p {
   border-color: var(--accent);
 }
 
+.wbs-field-section-label {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.wbs-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 4px;
+}
+
 /* --- buttons --- */
 
 .wbs-btn {
@@ -123,6 +145,7 @@ p {
   color: var(--text-primary);
   font: inherit;
   font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
   align-self: flex-start;
 }
@@ -163,56 +186,100 @@ p {
   font-size: 13px;
 }
 
-/* --- tree --- */
+/* --- tree (table layout) --- */
 
-.wbs-tree,
-.wbs-children {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.wbs-children {
-  padding-top: 4px;
-}
-
-.wbs-node {
+.wbs-legend {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.wbs-node-name {
-  flex: 0 0 200px;
-  min-width: 0;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wbs-node-dates {
-  flex: 0 0 auto;
+  gap: 16px;
+  padding: 8px 0 12px;
   font-size: 12px;
+  color: var(--text-muted);
+}
+
+.wbs-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wbs-legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.wbs-legend-swatch-plan {
+  background: var(--accent);
+}
+
+.wbs-legend-swatch-actual {
+  height: 4px;
+  background: var(--text-muted);
+}
+
+.wbs-timeline-ruler {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 16px;
+}
+
+.wbs-timeline-tick {
+  position: absolute;
+  bottom: 4px;
+  font-size: 11px;
   color: var(--text-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
-.wbs-node-assignee {
-  flex: 0 0 80px;
+/* 表全体。ヘッダー行＋タスク行がすべて同じgrid-template-columnsに
+   従うので、名前・担当者・...・スケジュールの列が全行で揃う。
+   横に長くなるので、画面が狭いときは表だけ横スクロールさせる。 */
+.wbs-table {
+  display: grid;
+  grid-template-columns:
+    minmax(160px, 1.4fr) 90px 84px 56px 52px 168px minmax(260px, 3fr);
+  column-gap: 10px;
+  border-top: 1px solid var(--border-strong);
+  overflow-x: auto;
+}
+
+.wbs-cell {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
   overflow: hidden;
+}
+
+.wbs-cell-head {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-strong);
+  align-items: flex-end;
+  padding-bottom: 6px;
+}
+
+.wbs-cell-name {
+  font-weight: 500;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-.wbs-badge {
+.wbs-node-connector {
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-right: 4px;
   flex: 0 0 auto;
+}
+
+.wbs-badge {
   padding: 2px 8px;
   border: 1px solid var(--border-strong);
   border-radius: 999px;
@@ -221,11 +288,20 @@ p {
   white-space: nowrap;
 }
 
+.wbs-cell-actions {
+  gap: 6px;
+}
+
+.wbs-cell-timeline {
+  position: relative;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .wbs-bar-track {
   position: relative;
-  flex: 1 1 auto;
-  min-width: 40px;
-  height: 16px;
+  width: 100%;
+  height: 20px;
   background: var(--accent-track);
   border-radius: 4px;
   overflow: hidden;
@@ -234,38 +310,70 @@ p {
 .wbs-bar-fill {
   position: absolute;
   top: 0;
-  height: 100%;
+  height: 12px;
   background: var(--accent);
   border-radius: 4px;
-  overflow: hidden;
 }
 
-.wbs-bar-progress {
-  height: 100%;
-  background: var(--accent-strong);
+/* 実績期間のバー。計画バー（.wbs-bar-fill）の下に、細めのグレーで重ねる。
+   色を変えているのは、計画と実績を一目で見分けられるようにするため。 */
+.wbs-bar-actual {
+  position: absolute;
+  top: 15px;
+  height: 4px;
+  background: var(--text-muted);
+  border-radius: 2px;
 }
 
-.wbs-node-actions {
+/* <ul>/<li>はグリッドのレイアウトに関与させず、中の.wbs-cellだけを
+   .wbs-tableの直接の子であるかのように扱わせる。これで再帰で描画した
+   親子のDOM構造を保ったまま、見た目は1タスク＝1行の表になる。 */
+.wbs-tree,
+.wbs-children,
+.wbs-tree > li,
+.wbs-children > li {
+  display: contents;
+}
+
+/* 編集行のエラー表示だけは、表の列を無視して行全体に広げる。 */
+.wbs-cell-edit {
+  grid-column: 1 / -1;
+}
+
+/* 編集モードのセルの中身。表示モードと同じ.wbs-cellの箱を使うが、
+   縦に複数の入力欄を積めるようにflex-directionをcolumnにする。 */
+.wbs-cell-edit-name,
+.wbs-cell-edit-timeline {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.wbs-edit-date-pair {
   display: flex;
-  gap: 6px;
-  flex: 0 0 auto;
+  gap: 4px;
 }
 
-.wbs-edit-row {
+.wbs-edit-mini-field {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  padding: 8px 0;
-  width: 100%;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
-.wbs-edit-row input {
-  padding: 6px 8px;
+.wbs-edit-input {
+  width: 100%;
+  padding: 4px 6px;
   border: 1px solid var(--border-strong);
   border-radius: 4px;
   font: inherit;
-  font-size: 14px;
+  font-size: 12px;
+  color: var(--text-primary);
+  background: var(--surface);
 }
 
 .wbs-error {
