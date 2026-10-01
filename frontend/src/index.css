@@ -11,7 +11,7 @@
 
   --accent: #2a78d6;
   --accent-strong: #184f95;
-  --accent-track: #cde2fb;
+  --actual: #eb6834;
 
   --danger: #d03b3b;
   --danger-strong: #a92e2e;
@@ -42,7 +42,7 @@
 
     --accent: #3987e5;
     --accent-strong: #86b6ef;
-    --accent-track: #184f95;
+    --actual: #d95926;
 
     --danger: #e66767;
     --danger-strong: #ec8a8a;
@@ -215,8 +215,7 @@ p {
 }
 
 .wbs-legend-swatch-actual {
-  height: 4px;
-  background: var(--text-muted);
+  background: var(--actual);
 }
 
 .wbs-timeline-ruler {
@@ -305,31 +304,34 @@ p {
   padding-right: 0;
 }
 
+/* トラック背景はニュートラルなグレー（どちらのバーの色とも無関係）。
+   計画バーと同系色にすると「背景も計画の一部」に見えてしまうため、
+   あえて色相を変えてある。 */
 .wbs-bar-track {
   position: relative;
   width: 100%;
   height: 20px;
-  background: var(--accent-track);
+  background: var(--border);
   border-radius: 4px;
   overflow: hidden;
 }
 
+/* 計画バー・実績バーは同じ太さ（8px）にして対等に扱う。
+   区別は色（青 vs オレンジ）だけで付ける。 */
 .wbs-bar-fill {
   position: absolute;
-  top: 0;
-  height: 12px;
+  top: 2px;
+  height: 8px;
   background: var(--accent);
   border-radius: 4px;
 }
 
-/* 実績期間のバー。計画バー（.wbs-bar-fill）の下に、細めのグレーで重ねる。
-   色を変えているのは、計画と実績を一目で見分けられるようにするため。 */
 .wbs-bar-actual {
   position: absolute;
-  top: 15px;
-  height: 4px;
-  background: var(--text-muted);
-  border-radius: 2px;
+  top: 11px;
+  height: 8px;
+  background: var(--actual);
+  border-radius: 4px;
 }
 
 /* <ul>/<li>はグリッドのレイアウトに関与させず、中の.wbs-cellだけを
