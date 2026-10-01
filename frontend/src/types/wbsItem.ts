@@ -15,6 +15,7 @@ export type WbsItem = {
   actualEndDate: string | null;
   notes: string | null;
   category: string | null;
+  milestone: boolean;
 };
 
 // ツリー表示用の形。WbsItemの全フィールド＋自分の子供（同じ型の配列）。

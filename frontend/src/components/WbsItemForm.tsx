@@ -16,6 +16,7 @@ export const WbsItemForm = () => {
   const [actualEndDate, setActualEndDate] = useState("");
   const [notes, setNotes] = useState("");
   const [category, setCategory] = useState("");
+  const [milestone, setMilestone] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -41,6 +42,7 @@ export const WbsItemForm = () => {
       actualEndDate: actualEndDate === "" ? null : actualEndDate,
       notes: notes === "" ? null : notes,
       category: category === "" ? null : category,
+      milestone: milestone,
     };
 
     if (item.startDate > item.endDate) {
@@ -130,6 +132,14 @@ export const WbsItemForm = () => {
           type="text"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
+        />
+      </label>
+      <label className="wbs-field">
+        マイルストーン
+        <input
+          type="checkbox"
+          checked={milestone}
+          onChange={(e) => setMilestone(e.target.checked)}
         />
       </label>
 

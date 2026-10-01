@@ -244,23 +244,35 @@ export const WbsTreeNode = (props: Props) => {
               {/* left/widthは%指定。.wbs-bar-trackがposition:relativeなので
                   「トラック全体の幅に対する割合」として解釈される。
                   これで画面幅やタイムラインの長さが変わっても自動で収まる。 */}
-              <div
-                className="wbs-bar-fill"
-                title={`計画期間：${node.startDate}~${node.endDate}`}
-                style={{
-                  left: `${(offsetDays / totalTimelineDays) * 100}%`,
-                  width: `${(durationDays / totalTimelineDays) * 100}%`,
-                }}
-              />
-              {actualOffsetDays !== null && actualDurationDays !== null && (
-                <div
-                  className="wbs-bar-actual"
-                  title={`実績期間：${node.actualStartDate}~${node.actualEndDate}`}
-                  style={{
-                    left: `${(actualOffsetDays / totalTimelineDays) * 100}%`,
-                    width: `${(actualDurationDays / totalTimelineDays) * 100}%`,
-                  }}
-                />
+              {node.milestone ? (
+                <span
+                  className="wbs-milestone-marker"
+                  style={{ left: `${(offsetDays / totalTimelineDays) * 100}%` }}
+                  title={`マイルストーン：${node.startDate}`}
+                >
+                  ◆
+                </span>
+              ) : (
+                <>
+                  <div
+                    className="wbs-bar-fill"
+                    title={`計画期間：${node.startDate}~${node.endDate}`}
+                    style={{
+                      left: `${(offsetDays / totalTimelineDays) * 100}%`,
+                      width: `${(durationDays / totalTimelineDays) * 100}%`,
+                    }}
+                  />
+                  {actualOffsetDays !== null && actualDurationDays !== null && (
+                    <div
+                      className="wbs-bar-actual"
+                      title={`実績期間：${node.actualStartDate}~${node.actualEndDate}`}
+                      style={{
+                        left: `${(actualOffsetDays / totalTimelineDays) * 100}%`,
+                        width: `${(actualDurationDays / totalTimelineDays) * 100}%`,
+                      }}
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -30,6 +30,7 @@ export const WbsItemEditForm = (props: Props) => {
   const [actualEndDate, setActualEndDate] = useState(node.actualEndDate);
   const [notes, setNotes] = useState(node.notes ?? "");
   const [category, setCategory] = useState(node.category ?? "");
+  const [milestone, setMilestone] = useState(node.milestone);
   const [errorMessage, setErrorMessage] = useState("");
 
   const queryClient = useQueryClient();
@@ -62,6 +63,7 @@ export const WbsItemEditForm = (props: Props) => {
       actualEndDate: actualEndDate,
       notes: notes,
       category: category,
+      milestone: milestone,
     };
 
     if (startDate > endDate) {
@@ -193,19 +195,30 @@ export const WbsItemEditForm = (props: Props) => {
             onChange={(e) => setEndDate(e.target.value)}
           />
         </label>
-        <label className="wbs-edit-mini-field">
-          工数
-          <input
-            type="number"
-            className="wbs-edit-input"
-            value={effortDays === null ? "" : String(effortDays)}
-            onChange={(e) =>
-              setEffortDays(
-                e.target.value === "" ? null : Number(e.target.value),
-              )
-            }
-          />
-        </label>
+        <div className="wbs-edit-field-row">
+          <label className="wbs-edit-mini-field wbs-edit-mini-field-grow">
+            工数
+            <input
+              type="number"
+              step="0.5"
+              className="wbs-edit-input"
+              value={effortDays === null ? "" : String(effortDays)}
+              onChange={(e) =>
+                setEffortDays(
+                  e.target.value === "" ? null : Number(e.target.value),
+                )
+              }
+            />
+          </label>
+          <label className="wbs-edit-mini-field wbs-edit-mini-field-row">
+            マイルストーン
+            <input
+              type="checkbox"
+              checked={milestone}
+              onChange={(e) => setMilestone(e.target.checked)}
+            />
+          </label>
+        </div>
         <label className="wbs-edit-mini-field">
           実績開始
           <input

@@ -334,6 +334,18 @@ p {
   border-radius: 4px;
 }
 
+/* マイルストーンは期間ではなく1点なので、バーではなく◆マーカーにする
+   （Ganttチャートでの一般的な慣習）。計画・実績どちらの色とも違う、
+   ニュートラルな濃い色にして「特別な印」だと分かるようにする。 */
+.wbs-milestone-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
 /* <ul>/<li>はグリッドのレイアウトに関与させず、中の.wbs-cellだけを
    .wbs-tableの直接の子であるかのように扱わせる。これで再帰で描画した
    親子のDOM構造を保ったまま、見た目は1タスク＝1行の表になる。 */
@@ -376,6 +388,19 @@ p {
   flex-direction: column;
   align-items: stretch;
   gap: 1px;
+}
+
+/* 工数とマイルストーンを縦に積まず、1行にまとめる（タイムライン列が
+   縦に伸びすぎるのを防ぐ）。工数側は余った幅を使って広がる。 */
+.wbs-edit-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wbs-edit-mini-field-grow {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .wbs-edit-input {
