@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween } from "./dateMath";
+import { addDays, daysBetween, daysToPercent } from "./dateMath";
 
 describe("daysBetween", () => {
   it("returns 0 for the same date", () => {
@@ -36,5 +36,25 @@ describe("addDays", () => {
     const from = "2026-09-28";
     const to = "2026-10-15";
     expect(addDays(from, daysBetween(from, to))).toBe(to);
+  });
+});
+
+describe("daysToPercent", () => {
+  it("returns 0 when days is 0", () => {
+    expect(daysToPercent(0, 30)).toBe(0);
+  });
+
+  it("returns 100 when days equals totalDays", () => {
+    expect(daysToPercent(30, 30)).toBe(100);
+  });
+
+  it("returns the proportional percentage", () => {
+    expect(daysToPercent(5, 30)).toBeCloseTo(16.67, 1);
+  });
+
+  it("can exceed 100 when days is greater than totalDays", () => {
+    // 実績が計画の範囲をはみ出すケース（実績バーがタイムライン全体より
+    // 長くなる場合）でも、特別扱いせずそのまま計算する。
+    expect(daysToPercent(40, 30)).toBeCloseTo(133.33, 1);
   });
 });

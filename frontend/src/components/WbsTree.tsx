@@ -10,7 +10,7 @@ import {
   type WbsItemNode,
 } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
-import { addDays, daysBetween } from "../utils/dateMath";
+import { addDays, daysBetween, daysToPercent } from "../utils/dateMath";
 import { WbsItemEditForm } from "./WbsItemEditForm";
 
 // タイムラインの目盛りに何個ラベルを出すか。
@@ -412,7 +412,9 @@ export const WbsTreeNode = (props: Props) => {
               {node.milestone ? (
                 <span
                   className="wbs-milestone-marker"
-                  style={{ left: `${(offsetDays / totalTimelineDays) * 100}%` }}
+                  style={{
+                    left: `${daysToPercent(offsetDays, totalTimelineDays)}%`,
+                  }}
                   title={`マイルストーン：${node.startDate}`}
                 >
                   ◆
@@ -423,8 +425,8 @@ export const WbsTreeNode = (props: Props) => {
                     className="wbs-bar-fill"
                     title={`計画期間：${node.startDate}~${node.endDate}`}
                     style={{
-                      left: `${(offsetDays / totalTimelineDays) * 100}%`,
-                      width: `${(durationDays / totalTimelineDays) * 100}%`,
+                      left: `${daysToPercent(offsetDays, totalTimelineDays)}%`,
+                      width: `${daysToPercent(durationDays, totalTimelineDays)}%`,
                     }}
                   />
                   {actualOffsetDays !== null && actualDurationDays !== null && (
@@ -432,8 +434,8 @@ export const WbsTreeNode = (props: Props) => {
                       className="wbs-bar-actual"
                       title={`実績期間：${node.actualStartDate}~${node.actualEndDate}`}
                       style={{
-                        left: `${(actualOffsetDays / totalTimelineDays) * 100}%`,
-                        width: `${(actualDurationDays / totalTimelineDays) * 100}%`,
+                        left: `${daysToPercent(actualOffsetDays, totalTimelineDays)}%`,
+                        width: `${daysToPercent(actualDurationDays, totalTimelineDays)}%`,
                       }}
                     />
                   )}

@@ -118,11 +118,13 @@
       - 削除・並び替えのmutationとhandlerをまとめる（カスタムフックは
         新しい概念なので、まずは関数をファイル内で整理するだけでも可）
 
-- [ ] **5-2. ガントバーの%計算の重複をまとめる〔優先度：高・着手しやすい〕**
-      `(offsetDays / totalTimelineDays) * 100`という式が計画バー・
-      実績バー・マイルストーンの位置計算で4箇所重複している。
-      `daysToPercent(days, totalDays)`のような関数をutils/に1つ
-      追加して置き換える。影響範囲が狭いので最初の一歩に向く。
+- [x] **5-2. ガントバーの%計算の重複をまとめる〔優先度：高・着手しやすい〕** — 完了（2026-10-06）。
+      `utils/dateMath.ts`に`daysToPercent(days, totalDays)`を追加し、
+      `WbsTree.tsx`の4箇所（計画バーのleft/width、実績バーのleft/width、
+      マイルストーンのleft）を置き換え。テストは`dateMath.test.ts`に
+      4ケース追加。置き換え時に計画バーの`width`が`durationDays`では
+      なく`offsetDays`になっているコピペミスが一度入ったが、
+      レビューで発見・修正済み。
 
 - [ ] **5-3. propsのバケツリレー整理〔優先度：中〕**
       `timelineStart` / `totalTimelineDays` / `allTasks` /

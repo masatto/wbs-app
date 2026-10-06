@@ -14,3 +14,9 @@ export const addDays = (date: string, days: number): string => {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 };
+
+// タイムライン全体に対する「日数の割合」を%で返す（0〜100）。
+// ガントバーの位置・幅の計算で使う（例：全体30日中、開始が5日目なら約16.7%）。
+export const daysToPercent = (days: number, totalDays: number): number => {
+  return (days / totalDays) * 100;
+};
