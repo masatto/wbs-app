@@ -285,6 +285,15 @@ p {
   flex: 0 0 auto;
 }
 
+.wbs-predecessor-note {
+  margin-left: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .wbs-badge {
   padding: 2px 8px;
   border: 1px solid var(--border-strong);

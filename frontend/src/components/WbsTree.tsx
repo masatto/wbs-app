@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { fetchWbsItemDependencies } from "../api/wbsItemDependencies";
 import { deleteWbsItem, fetchWbsItems } from "../api/wbsItems";
 import {
   WBS_ITEM_PRIORITY_LABEL,
   WBS_ITEM_STATUS_LABEL,
+  type WbsItem,
+  type WbsItemDependency,
   type WbsItemNode,
 } from "../types/wbsItem";
 import { buildWbsTree } from "../utils/buildWbsTree";
@@ -27,6 +30,13 @@ export const WbsTree = () => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["wbsItems"],
     queryFn: fetchWbsItems,
+  });
+
+  // 先行タスクの表示用。WbsItemEditFormと同じqueryKeyなので
+  // キャッシュを共有する（編集で追加・削除すればここも自動で更新される）。
+  const { data: dependencies } = useQuery({
+    queryKey: ["wbsItemDependencies"],
+    queryFn: fetchWbsItemDependencies,
   });
 
   if (isPending) {
@@ -119,6 +129,8 @@ export const WbsTree = () => {
               node={rootNode}
               timelineStart={earliestStartDate}
               totalTimelineDays={totalTimelineDays}
+              allTasks={data}
+              dependencies={dependencies ?? []}
               depth={0}
             />
           ))}
@@ -132,6 +144,8 @@ type Props = {
   node: WbsItemNode;
   timelineStart: string; // タイムライン全体の起点（一番早いstartDate）
   totalTimelineDays: number; // タイムライン全体の日数（%計算の分母）
+  allTasks: WbsItem[]; // 先行タスクのid→名前解決に使う、全タスクのフラットな一覧
+  dependencies: WbsItemDependency[]; // 先行タスクの関連データ（全タスク分）
   depth: number; // ツリーの深さ（0=ルート）。名前の字下げにだけ使う
 };
 
@@ -146,8 +160,19 @@ type Props = {
 // <li>はdisplay:contentsなので、実際に描画する7つの.wbs-cellが
 // 親の.wbs-tableグリッドに直接所属し、1行として扱われる。
 export const WbsTreeNode = (props: Props) => {
-  const { node, timelineStart, totalTimelineDays, depth } = props;
+  const { node, timelineStart, totalTimelineDays, allTasks, dependencies, depth } =
+    props;
   const [isEditing, setIsEditing] = useState(false);
+
+  // このタスクの先行タスクの「名前」一覧（表示用）。
+  // 依存関係データ（predecessorIdだけ持つ）を、名前に解決する。
+  const predecessorNames = dependencies
+    .filter((dependency) => dependency.taskId === node.id)
+    .map(
+      (dependency) =>
+        allTasks.find((task) => task.id === dependency.predecessorId)?.name,
+    )
+    .filter((name): name is string => name !== undefined);
 
   const queryClient = useQueryClient();
 
@@ -208,6 +233,14 @@ export const WbsTreeNode = (props: Props) => {
             )}
             {node.category && (
               <span className="wbs-badge">{node.category}</span>
+            )}
+            {predecessorNames.length > 0 && (
+              <span
+                className="wbs-predecessor-note"
+                title={`先行タスク：${predecessorNames.join(", ")}`}
+              >
+                先行: {predecessorNames.join(", ")}
+              </span>
             )}
           </div>
           <div className="wbs-cell">{node.assignee}</div>
@@ -294,6 +327,8 @@ export const WbsTreeNode = (props: Props) => {
             node={child}
             timelineStart={timelineStart}
             totalTimelineDays={totalTimelineDays}
+            allTasks={allTasks}
+            dependencies={dependencies}
             depth={depth + 1}
           />
         ))}
