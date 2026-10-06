@@ -371,7 +371,7 @@ export const WbsTreeNode = (props: Props) => {
             <div className="wbs-reorder-buttons">
               <button
                 type="button"
-                className="wbs-btn wbs-btn-sm"
+                className="wbs-btn wbs-btn-sm wbs-btn-icon"
                 onClick={handleMoveUp}
                 disabled={!canMoveUp || reorderMutation.isPending}
                 title="上に移動"
@@ -380,7 +380,7 @@ export const WbsTreeNode = (props: Props) => {
               </button>
               <button
                 type="button"
-                className="wbs-btn wbs-btn-sm"
+                className="wbs-btn wbs-btn-sm wbs-btn-icon"
                 onClick={handleMoveDown}
                 disabled={!canMoveDown || reorderMutation.isPending}
                 title="下に移動"

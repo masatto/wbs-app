@@ -258,7 +258,7 @@ p {
 .wbs-table {
   display: grid;
   grid-template-columns:
-    minmax(160px, 1.4fr) 90px 84px 56px 52px 168px minmax(260px, 3fr);
+    minmax(200px, 1.8fr) 64px 68px 56px 52px 210px minmax(260px, 3fr);
   column-gap: 10px;
   border-top: 1px solid var(--border-strong);
   overflow-x: auto;
@@ -352,6 +352,12 @@ p {
   display: flex;
   gap: 2px;
   margin-right: 2px;
+}
+
+/* 並び替えの↑/↓は矢印1文字だけなので、編集・削除ボタンより
+   狭い専用の幅にして、4つ並べても操作列に収まるようにする。 */
+.wbs-btn-icon {
+  padding: 4px 6px;
 }
 
 .wbs-cell-timeline {
