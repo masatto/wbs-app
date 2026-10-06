@@ -96,4 +96,16 @@ describe("buildWbsTree", () => {
     expect(dbDesign.id).toBe(3);
     expect(dbDesign.children).toEqual([]);
   });
+
+  it("sorts siblings by orderIndex, even when it differs from insertion order", () => {
+    const outOfOrderItems: WbsItem[] = [
+      makeItem({ id: 10, name: "B", parentId: null, orderIndex: 2 }),
+      makeItem({ id: 11, name: "A", parentId: null, orderIndex: 1 }),
+      makeItem({ id: 12, name: "C", parentId: null, orderIndex: 3 }),
+    ];
+
+    const tree = buildWbsTree(outOfOrderItems);
+
+    expect(tree.map((node) => node.name)).toEqual(["A", "B", "C"]);
+  });
 });

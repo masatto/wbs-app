@@ -218,6 +218,11 @@ p {
   background: var(--actual);
 }
 
+.wbs-legend-swatch-today {
+  background: var(--danger);
+  width: 2px;
+}
+
 .wbs-timeline-ruler {
   position: relative;
   width: 100%;
@@ -232,6 +237,19 @@ p {
   color: var(--text-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
+/* 「今日」はヘッダーの目盛りとは別の見せ方（縦線＋赤）にして、
+   「期間を示す目盛り」と「今この瞬間」を混同しないようにする。 */
+.wbs-today-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px dashed var(--danger);
+  font-size: 10px;
+  color: var(--danger);
+  white-space: nowrap;
+  padding-left: 2px;
 }
 
 /* 表全体。ヘッダー行＋タスク行がすべて同じgrid-template-columnsに
@@ -278,6 +296,29 @@ p {
   flex: 0 0 auto;
 }
 
+/* 折りたたみボタン。子を持たないタスクでは代わりに同じ幅の
+   spacerを置き、名前の開始位置を全行で揃える。 */
+.wbs-collapse-toggle,
+.wbs-collapse-toggle-spacer {
+  flex: 0 0 auto;
+  width: 16px;
+  margin-right: 2px;
+}
+
+.wbs-collapse-toggle {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.wbs-collapse-toggle:hover {
+  color: var(--text-primary);
+}
+
 .wbs-notes-icon {
   margin-left: 4px;
   font-size: 12px;
@@ -305,6 +346,12 @@ p {
 
 .wbs-cell-actions {
   gap: 6px;
+}
+
+.wbs-reorder-buttons {
+  display: flex;
+  gap: 2px;
+  margin-right: 2px;
 }
 
 .wbs-cell-timeline {

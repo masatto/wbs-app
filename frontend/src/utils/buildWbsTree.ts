@@ -36,5 +36,15 @@ export function buildWbsTree(items: WbsItem[]): WbsItemNode[] {
     }
   });
 
-  return roots;
+  // 各階層（ルート・それぞれの子供）をorderIndexの昇順に並び替える。
+  // 再帰的に、子のそのまた子…まで全階層に適用する。
+  const sortByOrderIndex = (nodes: WbsItemNode[]): WbsItemNode[] => {
+    const sorted = [...nodes].sort((a, b) => a.orderIndex - b.orderIndex);
+    sorted.forEach((node) => {
+      node.children = sortByOrderIndex(node.children);
+    });
+    return sorted;
+  };
+
+  return sortByOrderIndex(roots);
 }
