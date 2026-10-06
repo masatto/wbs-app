@@ -109,13 +109,18 @@
       描画」（WbsTree本体）と「表示/編集切替・削除・並び替え・
       折りたたみ・ガントバー描画」（WbsTreeNode）が全部詰まっている。
       分割の方向性：
-      - ヘッダー行（凡例・目盛り・今日マーカー）を別コンポーネントに
+      - [x] ガントバー部分（計画バー・実績バー・マイルストーン◆）を
+        `components/GanttBar.tsx`に切り出し — 完了（2026-10-06）。
+        props は`node`/`timelineStart`/`totalTimelineDays`の3つにして、
+        offsetDays等の計算は`GanttBar`側に移動（利用する場所の近くに
+        計算ロジックを置く判断）。切り出し直後、`<GanttBar>`を
+        `isEditing`の条件分岐の外に置いてしまい、編集中に
+        `WbsItemEditForm`の7セルと合わせて8セルになり列がずれる
+        バグが一度入ったが、ブラウザでの目視確認で発見・修正済み
+        （tsc/lintでは検出できない種類のバグだった）。
+      - [ ] ヘッダー行（凡例・目盛り・今日マーカー）を別コンポーネントに
         切り出す
-      - ガントバー部分（計画バー・実績バー・マイルストーン◆）を
-        `GanttBar`のような専用コンポーネントに切り出す
-        （props: offsetDays, durationDays, actualOffsetDays,
-        actualDurationDays, totalTimelineDays, milestone）
-      - 削除・並び替えのmutationとhandlerをまとめる（カスタムフックは
+      - [ ] 削除・並び替えのmutationとhandlerをまとめる（カスタムフックは
         新しい概念なので、まずは関数をファイル内で整理するだけでも可）
 
 - [x] **5-2. ガントバーの%計算の重複をまとめる〔優先度：高・着手しやすい〕** — 完了（2026-10-06）。
