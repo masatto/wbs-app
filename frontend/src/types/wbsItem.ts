@@ -53,3 +53,12 @@ export const WBS_ITEM_PRIORITY_LABEL: Record<WbsItemPriority, string> = {
   MEDIUM: "中",
   LOW: "低",
 };
+
+// 「先行タスク」の関連1行。taskIdはpredecessorIdの後に開始する、という
+// 意味の関連。parentIdと違い別テーブルなので、1タスクが複数の先行タスクを
+// 持てる（バックエンドのWbsItemDependency参照）。
+export type WbsItemDependency = {
+  id: number;
+  taskId: number;
+  predecessorId: number;
+};

@@ -1,6 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { putWbsItem } from "../api/wbsItems";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import {
+  deleteWbsItemDependency,
+  fetchWbsItemDependencies,
+  postWbsItemDependency,
+} from "../api/wbsItemDependencies";
+import { fetchWbsItems, putWbsItem } from "../api/wbsItems";
 import {
   WBS_ITEM_PRIORITY_LABEL,
   WBS_ITEM_STATUS_LABEL,
@@ -32,6 +37,32 @@ export const WbsItemEditForm = (props: Props) => {
   const [category, setCategory] = useState(node.category ?? "");
   const [milestone, setMilestone] = useState(node.milestone);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedPredecessorIds, setSelectedPredecessorIds] = useState<
+    number[]
+  >([]);
+
+  const { data: dependencies } = useQuery({
+    queryKey: ["wbsItemDependencies"],
+    queryFn: fetchWbsItemDependencies,
+  });
+
+  const currentPredecessorIds =
+    dependencies
+      ?.filter((dependency) => dependency.taskId === node.id)
+      .map((dependency) => dependency.predecessorId) ?? [];
+
+  useEffect(() => {
+    const predecessorIds =
+      dependencies
+        ?.filter((dependency) => dependency.taskId === node.id)
+        .map((dependency) => dependency.predecessorId) ?? [];
+    setSelectedPredecessorIds(predecessorIds);
+  }, [dependencies, node.id]);
+
+  const { data: allTasks } = useQuery({
+    queryKey: ["wbsItems"],
+    queryFn: fetchWbsItems,
+  });
 
   const queryClient = useQueryClient();
 
@@ -44,7 +75,28 @@ export const WbsItemEditForm = (props: Props) => {
     },
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    const predecessorIdToAdd = selectedPredecessorIds.filter(
+      (id) => !currentPredecessorIds.includes(id),
+    );
+
+    const dependenciesToRemove =
+      dependencies?.filter(
+        (dependency) =>
+          dependency.taskId === node.id &&
+          !selectedPredecessorIds.includes(dependency.predecessorId),
+      ) ?? [];
+
+    await Promise.all([
+      ...predecessorIdToAdd.map((predecessorId) =>
+        postWbsItemDependency(node.id, predecessorId),
+      ),
+      ...dependenciesToRemove.map((dependency) =>
+        deleteWbsItemDependency(dependency.id),
+      ),
+    ]);
+
+    queryClient.invalidateQueries({ queryKey: ["wbsItemDependencies"] });
     // parentId・orderIndexは編集フォームでは触らせていないが、PUTは
     // 全フィールド必須（部分更新ではない）なので、nodeの現在値をそのまま
     // 乗せて送り返す。ここを省略すると親子関係が壊れる。
@@ -106,6 +158,28 @@ export const WbsItemEditForm = (props: Props) => {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           />
+        </label>
+        <label className="wbs-edit-mini-field">
+          先行タスク
+          <select
+            multiple
+            className="wbs-edit-input"
+            value={selectedPredecessorIds.map(String)}
+            onChange={(e) => {
+              const selected = Array.from(e.target.selectedOptions).map(
+                (option) => Number(option.value),
+              );
+              setSelectedPredecessorIds(selected);
+            }}
+          >
+            {allTasks
+              ?.filter((task) => task.id != node.id)
+              .map((task) => (
+                <option key={task.id} value={task.id}>
+                  {task.name}
+                </option>
+              ))}
+          </select>
         </label>
       </div>
 
