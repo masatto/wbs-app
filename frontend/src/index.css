@@ -195,6 +195,7 @@ p {
   padding: 8px 0 12px;
   font-size: 12px;
   color: var(--text-muted);
+  grid-column: 1 / -1;
 }
 
 .wbs-legend-item {
